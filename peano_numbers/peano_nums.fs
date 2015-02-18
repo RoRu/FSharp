@@ -1,4 +1,5 @@
-﻿// Peano numbers by Vladimir Yumatov
+// Peano numbers
+// by Vladimir Yumatov 
 // SPBSU 171 gr. 
 type Peano = Zero | S of Peano
 
