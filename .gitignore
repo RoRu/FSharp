@@ -1,0 +1,6 @@
+*.fsproj
+*.sln
+*.userprefs
+bin/
+obj/
+AssemblyInfo.fs
