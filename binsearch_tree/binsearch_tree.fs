@@ -2,6 +2,9 @@
 // by Vladimir Yumatov
 // SPBSU 171 gr.
 
+// Предполагаемое время выполнения: 2 часа
+// Реальное время выполнения: 2.5 часа
+
 open System
 
 type BsTree = 
@@ -61,22 +64,31 @@ let rec BstPrint opt t =
 
 [<EntryPoint>]
 let main argv =
-  Console.Write("How many nodes do you want: ")
-  let n = Console.ReadLine() |> int
-
-  let rec GetTree nodes t =
-    match nodes with
-    | 0 -> t
-    | _ ->
-      let k = Console.ReadLine() |> int
-      let t' = BstAdd k t
-      GetTree (nodes-1) t'
-  
   let tr = Empty
-  Console.Write("Enter your numbers: ")
-  let tr = GetTree n tr
+  BstPrint "LCR" tr
+  printf "\n"
 
-  Console.Write("Enter LCR, LRC, CLR: ")
-  let printOption = Console.ReadLine()
-  BstPrint printOption tr
+  let tr = BstAdd 8 tr
+  let tr = BstAdd 3 tr
+  let tr = BstAdd 10 tr
+  let tr = BstAdd 6 tr
+  let tr = BstAdd 14 tr
+  let tr = BstAdd 1 tr
+  let tr = BstAdd 7 tr
+  let tr = BstAdd 4 tr
+
+  BstPrint "LCR" tr
+  printf "\n"
+
+  let tr = BstDel 3 tr
+  let tr = BstDel 14 tr
+
+  BstPrint "LCR" tr
+  printf "\n"
+
+  BstPrint "LRC" tr
+  printf "\n"
+
+  BstPrint "CLR" tr
+  printf "\n"
   0
