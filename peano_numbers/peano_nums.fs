@@ -1,7 +1,10 @@
 // Peano numbers
 // by Vladimir Yumatov 
 // SPBSU 171 gr. 
-type Peano = Zero | S of Peano
+
+type Peano = 
+  | Zero 
+  | S of Peano
 
 let rec pnSum a b = 
   match a with

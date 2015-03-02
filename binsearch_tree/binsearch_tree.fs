@@ -16,17 +16,19 @@ let rec BstAdd x t =
   match x, t with
   | x, Empty -> Item(x, Empty, Empty)
   | x, Item(y, lft, rgt) ->
-    if x > y then Item(y, lft, BstAdd x rgt)
-    else if x < y then Item(y, BstAdd x lft, rgt)
-    else Item(y, lft, rgt)
+    match (compare x y) with
+    | 1  -> Item(y, lft, BstAdd x rgt)
+    | -1 -> Item(y, BstAdd x lft, rgt)
+    | _ -> Item(y, lft, rgt)
 
 let rec BstDel x t = 
   match x, t with
   | _, Empty -> Empty
   | x, Item(y, lft, rgt) ->
-    if x > y then Item(y, lft, BstDel x rgt)
-    else if x < y then Item(y, BstDel x lft, rgt)
-    else
+    match (compare x y) with
+    | 1  -> Item(y, lft, BstDel x rgt)
+    | -1 -> Item(y, BstDel x lft, rgt)
+    | _ -> 
       match lft, rgt with
       | Empty, Empty -> Empty
       | Empty, rgt -> rgt
@@ -64,24 +66,24 @@ let rec BstPrint opt t =
 
 [<EntryPoint>]
 let main argv =
-  let tr = Empty
+  let mutable tr = Empty
   BstPrint "LCR" tr
   printf "\n"
 
-  let tr = BstAdd 8 tr
-  let tr = BstAdd 3 tr
-  let tr = BstAdd 10 tr
-  let tr = BstAdd 6 tr
-  let tr = BstAdd 14 tr
-  let tr = BstAdd 1 tr
-  let tr = BstAdd 7 tr
-  let tr = BstAdd 4 tr
+  tr <- BstAdd 8 tr
+  tr <- BstAdd 3 tr
+  tr <- BstAdd 10 tr
+  tr <- BstAdd 6 tr
+  tr <- BstAdd 14 tr
+  tr <- BstAdd 1 tr
+  tr <- BstAdd 7 tr
+  tr <- BstAdd 4 tr
 
   BstPrint "LCR" tr
   printf "\n"
 
-  let tr = BstDel 3 tr
-  let tr = BstDel 14 tr
+  tr <- BstDel 3 tr
+  tr <- BstDel 14 tr
 
   BstPrint "LCR" tr
   printf "\n"
