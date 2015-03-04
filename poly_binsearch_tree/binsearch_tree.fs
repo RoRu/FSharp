@@ -1,15 +1,10 @@
-﻿// Solution for binary search tree
+﻿// Solution for polymorphic binary search tree
 // by Vladimir Yumatov
 // SPBSU 171 gr.
 
-// Предполагаемое время выполнения: 2 часа
-// Реальное время выполнения: 2.5 часа
-
-open System
-
-type BsTree = 
+type BsTree<'A> = 
   | Empty 
-  | Item of int * BsTree * BsTree
+  | Item of 'A * BsTree<'A> * BsTree<'A> 
 
 
 let rec BstAdd x t =
@@ -17,32 +12,32 @@ let rec BstAdd x t =
   | x, Empty -> Item(x, Empty, Empty)
   | x, Item(y, lft, rgt) ->
     match (compare x y) with
-    | 1  -> Item(y, lft, BstAdd x rgt)
-    | -1 -> Item(y, BstAdd x lft, rgt)
+    | c when c > 0  -> Item(y, lft, BstAdd x rgt)
+    | c when c < 0 -> Item(y, BstAdd x lft, rgt)
     | _ -> Item(y, lft, rgt)
 
 let rec BstDel x t = 
   match x, t with
   | _, Empty -> Empty
-  | x, Item(y, lft, rgt) ->
+  | _, Item(y, lft, rgt) ->
     match (compare x y) with
-    | 1  -> Item(y, lft, BstDel x rgt)
-    | -1 -> Item(y, BstDel x lft, rgt)
+    | c when c > 0  -> Item(y, lft, BstDel x rgt)
+    | c when c < 0 -> Item(y, BstDel x lft, rgt)
     | _ -> 
       match lft, rgt with
       | Empty, Empty -> Empty
       | Empty, rgt -> rgt
       | lft, Empty -> lft
       | lft, Item(y', Empty, rgt') -> Item(y', lft, rgt')
-      | lft, Item(y1, lft1, rgt1) ->
+      | lft, Item(y', lft', rgt') ->
         let rec ReplaceSearch t = 
           match t with
-          | Empty -> 0
+          | Empty -> y' 
           | Item(n, Empty, _) -> n
-          | Item(n, l, _) -> ReplaceSearch l
-       
-        let rep = ReplaceSearch lft1
-        Item(rep, lft, BstDel rep (Item(y1, lft1, rgt1)))
+          | Item(_, l, _) -> ReplaceSearch l
+        
+        let rep = ReplaceSearch lft'
+        Item(rep, lft, BstDel rep (Item(y', lft', rgt')))
 
 let rec BstPrint opt t = 
   match t with
@@ -51,14 +46,14 @@ let rec BstPrint opt t =
     match opt with
     | "LCR" -> 
       BstPrint opt lft
-      printf "%d " x
+      printf "%A " x
       BstPrint opt rgt
     | "LRC" ->
       BstPrint opt lft
       BstPrint opt rgt
-      printf "%d " x
+      printf "%A " x
     | "CLR" -> 
-      printf "%d " x
+      printf "%A " x
       BstPrint opt lft
       BstPrint opt rgt
     | _ -> printf "%s " "Unknown command\n"
@@ -70,20 +65,21 @@ let main argv =
   BstPrint "LCR" tr
   printf "\n"
 
-  tr <- BstAdd 8 tr
-  tr <- BstAdd 3 tr
-  tr <- BstAdd 10 tr
-  tr <- BstAdd 6 tr
-  tr <- BstAdd 14 tr
-  tr <- BstAdd 1 tr
-  tr <- BstAdd 7 tr
-  tr <- BstAdd 4 tr
+  tr <- BstAdd "x" tr
+  tr <- BstAdd "z" tr
+  tr <- BstAdd "y" tr
+  //tr <- BstAdd 'a' tr
+  tr <- BstAdd "d" tr
+  //tr <- BstAdd 'g' tr
+  //tr <- BstAdd 'l' tr
+  //tr <- BstAdd 'x' tr
+  //tr <- BstAdd 'e' tr
 
   BstPrint "LCR" tr
   printf "\n"
 
-  tr <- BstDel 3 tr
-  tr <- BstDel 14 tr
+  tr <- BstDel "x" tr
+ // tr <- BstDel 'e' tr
 
   BstPrint "LCR" tr
   printf "\n"
