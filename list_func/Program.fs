@@ -2,8 +2,8 @@
 // by Yumatov Vladimir
 // SPBSU 171 gr.
 
-// Ожидаемое время: 2 часа
-// Реальное время: 3.5 часов
+// Expected execution time: 2 h
+// Real time: 3.5 h
 
 // Task 9
 // List.iter : ('a -> unit) -> 'a list -> unit
@@ -31,24 +31,26 @@ let Horner a cfs =
 
 [<EntryPoint>]
 let main argv = 
-  let ls = [1; 2; 3; 4; 5; 6]
+  printfn "Task 9 - List.iter : ('a -> unit) -> 'a list -> unit\n"
+
+  let ls = [1; 2; 3; 4; 5; 6] 
 
   let n = Reverse ls
-  printfn "Reversed list %A is %A\n" ls n
+  printfn "Task 10 - Reversed list %A is %A\n" ls n
 
   let fil z = 
     z % 2 = 0
   let n = Filter fil ls
-  printfn "Filter: Even elements of %A are %A\n" ls n
+  printfn "Task 11 - Filter: Even elements of %A are %A\n" ls n
 
   let Dbl z = 
     z * 2
   let n = Map Dbl ls
-  printfn "Map: Doubled elements of %A are %A\n" ls n
+  printfn "Task 12 - Map: Doubled elements of %A are %A\n" ls n
 
 
   let cfs = [4; 5; 9; 1] // 4x^3 + 5x^2 + 9x + 1
   let x0 = 5
   let n = Horner x0 cfs
-  printfn "Horner result with coefficients %A is %d\n" cfs n
+  printfn "Task 13 - Horner's result with coefficients %A in x=%d is %d\n" cfs x0 n
   0 
