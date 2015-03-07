@@ -6,6 +6,7 @@
 // Expected execution time: 2.5 h
 // Real time: ~3.5 h
 
+
 // Type for Binary search tree
 type BsTree<'A> = 
   | Empty 
@@ -31,11 +32,10 @@ let rec BstDel x t =
     | c when c < 0 -> Item(y, BstDel x lft, rgt)
     | _ -> 
       match lft, rgt with
-      | Empty, Empty -> Empty
-      | Empty, rgt -> rgt
-      | lft, Empty -> lft
-      | lft, Item(y', Empty, rgt') -> Item(y', lft, rgt')
-      | lft, Item(y', lft', rgt') ->
+      | Empty, _ -> rgt
+      | _, Empty -> lft
+      | _, Item(y', Empty, rgt') -> Item(y', lft, rgt')
+      | _, Item(y', lft', rgt') ->
         let rec ReplaceSearch t = 
           match t with
           | Empty -> y' 
@@ -82,11 +82,21 @@ let rec TreeFold f res tr =
     //f (f (TreeFold f res lft) (TreeFold f res rgt)) x
 
 
-// Returns the least element out of a, b
-let rec Min a b = 
-  match a with
-  | None -> Some b
-  | Some a -> Some (min a b)
+// Task 17 Sum of elements in integer tree
+let TreeSum tr = TreeFold (fun a b -> a + b) 0 tr 
+
+
+// Task 18 Find min value in tree
+let TreeMin tr = 
+  let rec LessElm a b = // Returns the least element out of a, b
+    match a with
+    | None -> Some b
+    | Some a -> Some (min a b)
+  TreeFold LessElm None tr
+
+
+// Task 19 Copy tree
+let TreeCopy tr = TreeFold (fun res t -> BstAdd t res) Empty tr
 
 
 [<EntryPoint>]
@@ -125,26 +135,21 @@ let main argv =
   BstPrint "LCR" tr
 
 
-  let Dbl z = 
-    z * 2
-  let n = TreeMap Dbl tr
-  printfn "\n\nTask 15 - Doubled elements of tree:"
+  let n = TreeMap (fun z -> z * 2) tr
+  printfn "\n\nTask 15 (Map) - Doubled elements of tree:"
   BstPrint "LCR" n;
 
-  // Task 17 Sum of elements in integer tree
-  let n = TreeFold (fun a b -> a + b) 0 tr
-  printfn "\n\nTask 16 and 17 - Sum of elements of tree via Fold for tree:\n4+2+1+3+9+10 = %d\n" n
+  let n = TreeFold (fun a b -> if (b % 2 = 0) then a + b else a) 0 tr
+  printfn "\n\nTask 16 (Fold) - Sum of even elements:\n2+4+10 = %d" n
 
+  let n = TreeSum tr
+  printfn "\nTask 17 - Sum of elements:\n4+2+1+3+9+10 = %d\n" n
 
-  // Task 18 Find min value
-  let n = TreeFold Min None tr
-  printfn "Task 18 - Min element is %A\n" n
+  let n = TreeMin tr
+  printfn "Task 18 - The least element is %A\n" n
 
-
-  // Task 19 Copy tree
-  let n = TreeFold (fun res t -> BstAdd t res) Empty tr
-  printfn "Task 19 - Copying of tree:\n"
+  let n = TreeCopy tr
+  printfn "Task 19 - Copying of tree:"
   BstPrint "LCR" n
   printfn "\n"
-
   0

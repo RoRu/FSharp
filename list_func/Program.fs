@@ -9,24 +9,20 @@
 // List.iter : ('a -> unit) -> 'a list -> unit
 
 // Task 10 
-let Reverse ls =
-  List.fold (fun res elm -> elm::res) [] ls
+let Reverse ls = List.fold (fun res elm -> elm::res) [] ls
 
 
 // Task 11 
-let Filter f ls =
-  List.foldBack (fun elm res -> 
-                 if f(elm) then elm::res else res) ls []
+let Filter f ls = List.foldBack (fun elm res -> 
+                                 if f(elm) then elm::res else res) ls []
 
 
 // Task 12 
-let Map f ls = 
-  List.foldBack (fun elm res -> f(elm)::res) ls []
+let Map f ls = List.foldBack (fun elm res -> f(elm)::res) ls []
 
 
 // Task 13 Horner's method
-let Horner a cfs = 
-  List.fold (fun res elm -> elm + res * a) 0 cfs
+let Horner a cfs = List.fold (fun res elm -> elm + res * a) 0 cfs
 
 
 [<EntryPoint>]
