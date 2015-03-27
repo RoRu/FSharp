@@ -15,10 +15,11 @@ type IGraph<'A> =
     // returns value by index of node
     abstract Val      : int  -> 'A
     // returns true if there is edge between two nodes
-    abstract IsEdge   : int  -> int -> bool // 
+    abstract IsEdge   : int  -> int -> bool 
     // return list of nodes that are available 
     // from this one through only one edge
     abstract OutNodes : int  -> int list
+    abstract InNodes  : int  -> int list
     // prints the graph
     abstract Print    : unit -> unit
   end
@@ -40,11 +41,16 @@ type AdjMxGraph<'A> (nodes : 'A list, e : (int * int) list) =
       member this.OutNodes nd = 
         let mutable res : int list = []
         for i in 0 .. size - 1  do
-          if edges.[nd, i] then res <- res @ [i]
-        res
+          if edges.[nd, i] then res <- i::res
+        List.rev res
+      member this.InNodes nd = 
+        let mutable res : int list = []
+        for i in 0 .. size - 1  do
+          if edges.[i, nd] then res <- i::res
+        List.rev res
       member this.Print () = 
         printfn "Nodes: %A" nodes
-        printfn "Edges: %A" edges
+        printfn "Edges:\n%A" edges
   end
 
 
@@ -52,18 +58,27 @@ type AdjMxGraph<'A> (nodes : 'A list, e : (int * int) list) =
 type AdjListGraph<'A> (nodes : 'A list, e : (int * int) list) = 
   class
     let size = nodes.Length
-    let edges = Array.create size (Array.create 0 0)
+    let edges = Array.create size List.empty
 
     do 
       for (n1, n2) in e do
-        Array.set edges n1 (Array.append edges.[n1] [|n2|])
+        Array.set edges n1 (n2::edges.[n1])
+      for i in 0..size-1 do
+        Array.set edges i (List.rev edges.[i])
+      
 
     interface IGraph<'A> with
       member this.Size () = size
       member this.Val ind = nodes.[ind]
       member this.IsEdge n1 n2 = 
-        Array.tryFind (fun k -> k = n2) edges.[n1] = Some n2
-      member this.OutNodes nd = Array.toList edges.[nd]
+        List.tryFind ((=) n2) edges.[n1] = Some n2
+      member this.OutNodes nd = edges.[nd]
+      member this.InNodes nd = 
+        let mutable res : int list = []
+        for i in 0 .. size - 1  do
+          if (List.tryFind ((=) nd) edges.[i]) = Some nd then 
+            res <- i::res
+        List.rev res
       member this.Print () = 
         printfn "Nodes: %A" nodes
         printfn "Edges: %A" edges
@@ -72,7 +87,7 @@ type AdjListGraph<'A> (nodes : 'A list, e : (int * int) list) =
 
 // Task 23 Returns all the nodes
 // to which there's a way from node 'n'
-let NodesFrom (gr : IGraph<'A>) n = 
+let AvailableFromThis (gr : IGraph<'A>) n = 
   let s = gr.Size()
   let visited = Array.create s false
   let rec dfs n' = 
@@ -82,12 +97,12 @@ let NodesFrom (gr : IGraph<'A>) n =
         dfs i
     else ()
   dfs n
-  (List.filter (Array.get visited) [0..s-1]).Tail
+  List.filter ((<>) n) (List.filter (Array.get visited) [0..s-1])
 
 
 // Task 24 Returns all the nodes 
 // from which there's a way to node 'n'
-let NodesTo (gr : IGraph<'A>) n = 
+let HaveAccessToThis (gr : IGraph<'A>) n = 
   let s = gr.Size()
   let find a =   
     let visited = Array.create s false
@@ -98,8 +113,9 @@ let NodesTo (gr : IGraph<'A>) n =
         visited.[nd] <- true
         List.fold (fun res nd -> res || (dfs nd)) false (gr.OutNodes nd)
       else false
-    dfs a
-  List.filter find [0..s-1]
+    dfs a 
+  List.filter ((<>) n) (List.filter find [0..s-1])
+           
 
 
 // Task 25 Interface for polymorphic marked graph 
@@ -124,10 +140,10 @@ let main argv =
       ((c :> IGraph<char>).OutNodes 0)
     printfn "Value of the first node: %A\n" ((c :> IGraph<char>).Val 0)
     printfn "\nTASK 23\nAll the nodes available from node 0:\n %A" 
-      (NodesFrom c 0)
-    printfn "\nTASK 24\nAll the nodes from which there's way to node 2:\n %A" 
-      (NodesTo c 2)
-
+      (AvailableFromThis c 0)
+    printfn "\nTASK 24\nAll the nodes from which there's way to node 2:\n %A"
+      (HaveAccessToThis c 2)
+   
     let c1 = AdjListGraph([1; 2; 3], [(0, 1); (1, 2); (0, 2)])
     printfn "\nTASK 22"
     (c1 :> IGraph<int>).Print()
@@ -137,4 +153,3 @@ let main argv =
       ((c1 :> IGraph<int>).OutNodes 0)
     printfn "Value of the first node: %A" ((c1 :> IGraph<int>).Val 0)
     0 
-    
