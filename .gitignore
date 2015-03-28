@@ -8,3 +8,4 @@ obj/
 AssemblyInfo.fs
 test/
 unit_test/
+packages/
