@@ -3,7 +3,7 @@
 // SPBU, group 171
 
 // Expected execution time: 3-3.5 h
-// Real time: 5.5 h 
+// Real time: 7 h 
 
 
 open NUnit.Framework
@@ -42,54 +42,47 @@ let prior operator =
   | _   -> 0
 
 
-let isOperator (a : string) = 
-  if a.Length = 1 && prior(a.[0]) > 0 then true else false
-
 
 // translates string to an actual expression in postfix notation 
 // and divides it into tokens
-let translate (exp : string) =
-  let stc = Stack<char>()
+let translate (e : string) =
+  let exp = "(" + e.Replace(" ", "") + ")"
+  //printfn "%A\n" exp
+  let ostc = Stack<char>()
   let res = Stack<string>()
 
   let mutable temp = ""
   for i in 0..exp.Length - 1 do
-    let t = exp.[i]
-    if System.Char.IsDigit(t) then 
-      temp <- temp + t.ToString()
+    let ch = exp.[i]
+    //printfn "%A   %A   %A   %A" ch temp stc res
+    if (System.Char.IsLetterOrDigit(ch)) then 
+      temp <- temp + ch.ToString()
     else
-      match t with
-      | ' ' ->
-        if System.Char.IsDigit(exp.[i - 1]) then
+      match ch with
+      | '-' when (System.Char.IsLetterOrDigit(exp.[i + 1]) &&
+                  exp.[i - 1] = '(') ->
+        temp <- "-"
+      | c when prior(c) > 0 ->
+        if System.Char.IsLetterOrDigit(exp.[i - 1]) then
           res.Push(temp)
           temp <- ""
-      | '(' -> stc.Push(t)
+        while ostc.Length > 0 && prior(ostc.Top()) >= prior(ch)
+          do res.Push(ostc.Pop().ToString())
+        ostc.Push(ch)
+      | '(' -> ostc.Push(ch)
       | ')' ->
         if temp.Length > 0 then
           res.Push(temp)
           temp <- "" 
-        while stc.Top() <> '(' && stc.Length > 0 do
-          res.Push(stc.Pop().ToString())
-        ignore(stc.Pop())
-      | _   ->
-        if t = '-' && System.Char.IsDigit(exp.[i + 1]) then 
-          temp <- "-"
-        else
-          while stc.Length > 0 && 
-                ((prior(stc.Top()) >= prior(t) && prior(t) < 3) || 
-                 (prior(stc.Top()) >  prior(t) && prior(t) = 3)) 
-            do res.Push(stc.Pop().ToString())
-          stc.Push(t)
-      
-  if temp.Length > 0 then
-    res.Push(temp)
-    temp <- "" 
-  while stc.Length > 0 do 
-    res.Push(stc.Pop().ToString())
+        while ostc.Length > 0 && ostc.Top() <> '(' do
+          res.Push(ostc.Pop().ToString())
+        if ostc.Length > 0 then ostc.Pop() |> ignore
+      | _ -> ()
+    
   res
 
 // returns result of the expression
-let calculate exp =
+let calculate exp (vars: string list) (vals: int list) =
   let opstack = translate(exp)
   printfn "\n%A" opstack
 
@@ -97,11 +90,23 @@ let calculate exp =
     let mutable a = 0
     let mutable b = 0
     let mutable temp = opstack.Pop()
+    let isOperator (a : string) = 
+      a.Length = 1 && prior(a.[0]) > 0
 
     if isOperator(temp) then a <- apply temp
+    elif System.Char.IsLetter(temp.[0]) then 
+      a <- vals.[List.findIndex ((=) temp) vars]
+    elif temp.Length > 1 && temp.[0] = '-' &&
+         System.Char.IsLetter(temp.[1]) then
+      a <- -vals.[List.findIndex ((=) temp.[1..temp.Length - 1]) vars]
     else a <- int temp
     temp <- opstack.Pop()
     if isOperator(temp) then b <- apply temp
+    elif System.Char.IsLetter(temp.[0]) then 
+      b <- vals.[List.findIndex ((=) temp) vars]
+    elif temp.Length > 1 && temp.[0] = '-' && 
+         System.Char.IsLetter(temp.[1]) then
+      b <- -vals.[List.findIndex ((=) temp.[1..temp.Length - 1]) vars]
     else b <- int temp
 
     match operator with
@@ -115,12 +120,15 @@ let calculate exp =
         match p with
         | 0 -> 1
         | 1 -> elm
-        | p -> elm * (pow elm (p - 1))
-      if a >= 0 then pow b (int a)
-      else 1 / (pow b (-int a))
+        | p' -> elm * (pow elm (p' - 1))
+      if a >= 0 then pow b a
+      else 1 / (pow b (-a))
     | _   -> failwith "Invalid operator"
       
   apply (opstack.Pop())
+
+ 
+   
 
 
 [<TestCase ("0 + 1",             Result = 1)>]
@@ -131,6 +139,7 @@ let calculate exp =
 [<TestCase ("123 % 10",          Result = 3)>]
 [<TestCase ("89 * 3",            Result = 267)>]
 [<TestCase ("678 ^ 0",           Result = 1)>]
+[<TestCase ("2 ^ 1 + 3",         Result = 5)>]
 [<TestCase ("3 ^ 2 ^ 2",         Result = 81)>]
 [<TestCase ("2 + 2 * 2",         Result = 6)>]
 [<TestCase ("(2 + 2) * 2",       Result = 8)>]
@@ -139,11 +148,32 @@ let calculate exp =
 [<TestCase ("0 * 1 + 1 + 1 * 0",             Result = 1)>]
 [<TestCase ("7 + 6 - 5 * (4 / (3 % 2 ^ 1))", Result = -7)>]
 let ``Simple calc tests`` e =
-    calculate e
+    calculate e [] []
    
+
+
+[<TestFixture>]
+type ``Calc with variables`` () = 
+  [<Test>]
+  member this.``Test 1`` () = 
+    (calculate "a + b" ["a"; "b"] [1; 2]) |> should equal 3
+
+  [<Test>]
+  member this.``Test 2`` () = 
+    (calculate "a * b" ["a"; "b"] [4; 6]) |> should equal 24
+  
+  [<Test>]
+  member this.``Test `` () = 
+    (calculate "(6 + LOL) * 2" ["LOL"] [2]) |> should equal 16
+
+  [<Test>]
+  member this.``Test`` () = 
+    (calculate "(6 + (-LOL)) * 2" ["LOL"] [2]) |> should equal 8
+
+
 
 
 [<EntryPoint>]
 let main argv = 
-  calculate "6 / 2" |> ignore
+  printfn "%A" (calculate "(6 + (-LOL)) * 2" ["LOL"] [2])
   0
