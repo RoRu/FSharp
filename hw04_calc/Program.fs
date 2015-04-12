@@ -66,7 +66,8 @@ let translate (e : string) =
         if System.Char.IsLetterOrDigit(exp.[i - 1]) then
           res.Push(temp)
           temp <- ""
-        while ostc.Length > 0 && prior(ostc.Top()) >= prior(ch)
+        while ostc.Length > 0 && 
+              prior(ostc.Top()) >= prior(ch) && prior(ch) < 3
           do res.Push(ostc.Pop().ToString())
         ostc.Push(ch)
       | '(' -> ostc.Push(ch)
@@ -115,14 +116,7 @@ let calculate exp (vars: string list) (vals: int list) =
     | "*" -> b * a
     | "/" -> b / a
     | "%" -> b % a 
-    | "^" ->
-      let rec pow elm p =
-        match p with
-        | 0 -> 1
-        | 1 -> elm
-        | p' -> elm * (pow elm (p' - 1))
-      if a >= 0 then pow b a
-      else 1 / (pow b (-a))
+    | "^" -> pown b a
     | _   -> failwith "Invalid operator"
       
   apply (opstack.Pop())
@@ -135,12 +129,14 @@ let calculate exp (vars: string list) (vals: int list) =
 [<TestCase ("5 + (-5)",          Result = 0)>]
 [<TestCase ("999999999 + 1",     Result = 1000000000)>]
 [<TestCase ("1 - 15",            Result = -14)>]
+[<TestCase ("1 - 2 - 3",         Result = -4)>]
 [<TestCase ("6 / 2",             Result = 3)>]
 [<TestCase ("123 % 10",          Result = 3)>]
 [<TestCase ("89 * 3",            Result = 267)>]
 [<TestCase ("678 ^ 0",           Result = 1)>]
 [<TestCase ("2 ^ 1 + 3",         Result = 5)>]
 [<TestCase ("3 ^ 2 ^ 2",         Result = 81)>]
+[<TestCase ("3 ^ 1 ^ 2",         Result = 3)>]
 [<TestCase ("2 + 2 * 2",         Result = 6)>]
 [<TestCase ("(2 + 2) * 2",       Result = 8)>]
 [<TestCase ("((1 + 1) * 3) ^ 3", Result = 216)>]
@@ -175,5 +171,5 @@ type ``Calc with variables`` () =
 
 [<EntryPoint>]
 let main argv = 
-  printfn "%A" (calculate "(6 + (-LOL)) * 2" ["LOL"] [2])
+  printfn "%A" (argv)
   0
