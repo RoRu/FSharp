@@ -68,7 +68,8 @@ let translate (e : string) =
         if System.Char.IsLetterOrDigit(exp.[i - 1]) then
           res.Push(temp)
           temp <- ""
-        while ostc.Length > 0 && prior(ostc.Top()) >= prior(ch)
+        while ostc.Length > 0 && 
+              prior(ostc.Top()) >= prior(ch) && prior(ch) < 3
           do res.Push(ostc.Pop().ToString())
         ostc.Push(ch)
       | '(' -> ostc.Push(ch)
@@ -150,7 +151,9 @@ let calcVert (fin: StreamReader) (fout: StreamWriter) =
 
 
 [<TestCase ("0 + 1",             Result = "0\n1\n+")>]
-[<TestCase ("3 ^ 2 ^ 2",         Result = "3\n2\n^\n2\n^")>]
+[<TestCase ("1 - 2 - 3",         Result = "1\n2\n-\n3\n-")>]
+[<TestCase ("3 ^ 2 ^ 2",         Result = "3\n2\n2\n^\n^")>]
+[<TestCase ("3 ^ 1 ^ 2",         Result = "3\n1\n2\n^\n^")>]
 [<TestCase ("2 + 2 * 2",         Result = "2\n2\n2\n*\n+")>]
 [<TestCase ("7 * (6 + 5)",       Result = "7\n6\n5\n+\n*")>]
 [<TestCase ("7 * 6 + 5",         Result = "7\n6\n*\n5\n+")>]
@@ -173,12 +176,14 @@ let ``Task 37`` (e: string) =
 [<TestCase ("5 + (-5)",          Result = "0")>]
 [<TestCase ("999999999 + 1",     Result = "1000000000")>]
 [<TestCase ("1 - 15",            Result = "-14")>]
+[<TestCase ("1 - 2 - 3",         Result = "-4")>]
 [<TestCase ("6 / 2",             Result = "3")>]
 [<TestCase ("123 % 10",          Result = "3")>]
 [<TestCase ("89 * 3",            Result = "267")>]
 [<TestCase ("678 ^ 0",           Result = "1")>]
 [<TestCase ("2 ^ 1 + 3",         Result = "5")>]
 [<TestCase ("3 ^ 2 ^ 2",         Result = "81")>]
+[<TestCase ("3 ^ 1 ^ 2",         Result = "3")>]
 [<TestCase ("2 + 2 * 2",         Result = "6")>]
 let ``Task 38`` (e: string) = 
   let w = new StreamWriter("test.in") 
