@@ -5,6 +5,7 @@
 // Expected time: 3.5 h
 // Real time: 5 h 
 
+module Calc
 
 open System.Windows.Forms
 open System.Drawing
@@ -77,12 +78,12 @@ let butOperator (op: string) =
   but.Click.Add(fun _ ->
     opFlag <- true
 
-    printfn "%A   %A   %A" operandL operator operandR
+    //printfn "%A   %A   %A" operandL operator operandR
     if operator = "" then
       operandL <- exprInput.Text
     operator <- op
     exprInput.Text <- op
-    printfn "%A   %A   %A" operandL operator operandR
+    //printfn "%A   %A   %A" operandL operator operandR
   )
   but
 
@@ -97,7 +98,7 @@ let butEq =
     if operator = "" then ()
     else
       operandR <- exprInput.Text
-      printfn "%A   %A   %A" operandL operator operandR
+      //printfn "%A   %A   %A" operandL operator operandR
       match operator with
       | "+" -> exprInput.Text <- 
                (float operandL + float operandR).ToString()
@@ -116,7 +117,7 @@ let butEq =
       operandL <- ""
       operandR <- ""
       opFlag <- false
-      printfn "%A   %A   %A" operandL operator operandR
+      //printfn "%A   %A   %A" operandL operator operandR
   )
   but
 
@@ -128,11 +129,11 @@ let butNeg =
   but.Text <- "±"
   but.Location <- Point(155, 115)
   but.Click.Add (fun _ ->
-    printfn "%A" (float exprInput.Text)
+    //printfn "%A" (float exprInput.Text)
     if (System.Char.IsDigit(exprInput.Text.[0]) && exprInput.Text <> "0") ||
        (exprInput.Text.[0] = '-' && exprInput.Text <> "-") then
       exprInput.Text <- ((float exprInput.Text) * (-1.0)).ToString()
-    printfn "%A" (float exprInput.Text)
+    //printfn "%A" (float exprInput.Text)
   )
   but
 
