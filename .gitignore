@@ -1,11 +1,6 @@
-*.fsproj
-*.sln
 *.userprefs
-*.config
 *.suo
 bin/
 obj/
 AssemblyInfo.fs
-test/
-unit_test/
 packages/
