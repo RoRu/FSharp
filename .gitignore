@@ -1,6 +1,13 @@
+*.dll
+*.xml
+*.bat
+*.pdb
 *.userprefs
 *.suo
+hw*/test
 bin/
 obj/
+.nuget/
+build/
 AssemblyInfo.fs
 packages/
