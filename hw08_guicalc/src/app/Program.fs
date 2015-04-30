@@ -9,7 +9,6 @@ module Calc
 
 open System.Windows.Forms
 open System.Drawing
-
 let mutable operandL = ""
 let mutable operandR = ""
 let mutable operator = ""
@@ -21,6 +20,7 @@ let exprInput =
   tbox.Width <- 250
   tbox.Font <- new Font("Arial", 13.0f)
   tbox.Text <- "0"
+  tbox.ReadOnly <- true
   tbox
 
 
@@ -77,13 +77,10 @@ let butOperator (op: string) =
 
   but.Click.Add(fun _ ->
     opFlag <- true
-
-    //printfn "%A   %A   %A" operandL operator operandR
     if operator = "" then
       operandL <- exprInput.Text
     operator <- op
     exprInput.Text <- op
-    //printfn "%A   %A   %A" operandL operator operandR
   )
   but
 
@@ -98,7 +95,6 @@ let butEq =
     if operator = "" then ()
     else
       operandR <- exprInput.Text
-      //printfn "%A   %A   %A" operandL operator operandR
       match operator with
       | "+" -> exprInput.Text <- 
                (float operandL + float operandR).ToString()
@@ -117,7 +113,6 @@ let butEq =
       operandL <- ""
       operandR <- ""
       opFlag <- false
-      //printfn "%A   %A   %A" operandL operator operandR
   )
   but
 
@@ -129,11 +124,9 @@ let butNeg =
   but.Text <- "±"
   but.Location <- Point(155, 115)
   but.Click.Add (fun _ ->
-    //printfn "%A" (float exprInput.Text)
     if (System.Char.IsDigit(exprInput.Text.[0]) && exprInput.Text <> "0") ||
        (exprInput.Text.[0] = '-' && exprInput.Text <> "-") then
       exprInput.Text <- ((float exprInput.Text) * (-1.0)).ToString()
-    //printfn "%A" (float exprInput.Text)
   )
   but
 
@@ -142,8 +135,8 @@ let butNeg =
 let butSqrt =
   let but = new Button()
   but.Text <- "√"
-  but.Size <- System.Drawing.Size(30, 30)
-  but.Location <- System.Drawing.Point(155, 150)
+  but.Size <- Size(30, 30)
+  but.Location <- Point(155, 150)
   but.Click.Add (fun _ ->
     exprInput.Text <- (sqrt(float exprInput.Text)).ToString()
   )
@@ -154,8 +147,8 @@ let butSqrt =
 let butSin = 
   let but = new Button()
   but.Text <- "Sin"
-  but.Size <- System.Drawing.Size(35, 30)
-  but.Location <- System.Drawing.Point(190, 45)
+  but.Size <- Size(35, 30)
+  but.Location <- Point(190, 45)
   but.Click.Add (fun _ ->
     exprInput.Text <- (sin(float exprInput.Text)).ToString()
   )
@@ -164,8 +157,8 @@ let butSin =
 let butCos = 
   let but = new Button()
   but.Text <- "Cos"
-  but.Size <- System.Drawing.Size(35, 30)
-  but.Location <- System.Drawing.Point(190, 80)
+  but.Size <- Size(35, 30)
+  but.Location <- Point(190, 80)
   but.Click.Add (fun _ ->
     exprInput.Text <- (cos(float exprInput.Text)).ToString()
   )
@@ -174,8 +167,8 @@ let butCos =
 let butTan = 
   let but = new Button()
   but.Text <- "Tan"
-  but.Size <- System.Drawing.Size(35, 30)
-  but.Location <- System.Drawing.Point(190, 115)
+  but.Size <- Size(35, 30)
+  but.Location <- Point(190, 115)
   but.Click.Add (fun _ ->
     exprInput.Text <- (tan(float exprInput.Text)).ToString()
   )
@@ -184,8 +177,8 @@ let butTan =
 let butCot = 
   let but = new Button()
   but.Text <- "Cot"
-  but.Size <- System.Drawing.Size(35, 30)
-  but.Location <- System.Drawing.Point(190, 150)
+  but.Size <- Size(35, 30)
+  but.Location <- Point(190, 150)
   but.Click.Add (fun _ ->
     exprInput.Text <- (1.0 / tan(float exprInput.Text)).ToString()
   )
@@ -196,8 +189,8 @@ let butCot =
 let butLn = 
   let but = new Button()
   but.Text <- "ln"
-  but.Size <- System.Drawing.Size(35, 30)
-  but.Location <- System.Drawing.Point(230, 45)
+  but.Size <- Size(35, 30)
+  but.Location <- Point(230, 45)
   but.Click.Add (fun _ ->
     exprInput.Text <- (log(float exprInput.Text)).ToString()
   )
@@ -206,8 +199,8 @@ let butLn =
 let butLg = 
   let but = new Button()
   but.Text <- "lg"
-  but.Size <- System.Drawing.Size(35, 30)
-  but.Location <- System.Drawing.Point(230, 80)
+  but.Size <- Size(35, 30)
+  but.Location <- Point(230, 80)
   but.Click.Add (fun _ ->
     exprInput.Text <- (log(float exprInput.Text) / 
                        log 10.0).ToString()
@@ -219,8 +212,8 @@ let butLg =
 let butRev = 
   let but = new Button()
   but.Text <- "1/x"
-  but.Size <- System.Drawing.Size(35, 30)
-  but.Location <- System.Drawing.Point(230, 115)
+  but.Size <- Size(35, 30)
+  but.Location <- Point(230, 115)
   but.Click.Add (fun _ ->
     exprInput.Text <- (1.0 / (float exprInput.Text)).ToString()
   )
@@ -308,6 +301,7 @@ let mainForm =
 [<EntryPoint>]
 let main argv = 
   mainForm.Visible <- true
-  Application.CurrentCulture <- System.Globalization.CultureInfo.InvariantCulture
+  Application.CurrentCulture <- 
+    System.Globalization.CultureInfo.InvariantCulture
   Application.Run()
   0 
