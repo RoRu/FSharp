@@ -4,7 +4,9 @@
 *.pdb
 *.userprefs
 *.suo
+*.exe
 hw*/test
+tools/
 bin/
 obj/
 .nuget/
