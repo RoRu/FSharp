@@ -1,5 +1,9 @@
-﻿// Learn more about F# at http://fsharp.net
-// See the 'F# Tutorial' project for more help.
+﻿// Tasks 46
+// by Vladimir Yumatov
+// SPBU, group 171
+
+// Expected time: 1.5 h
+// Real time: 2.25 h 
 
 module Threads
 
