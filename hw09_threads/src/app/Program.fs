@@ -10,7 +10,10 @@ module Threads
 open System.Threading
 
 //task 46 Max in array 
-let maxElm (arr: int []) threadNum = 
+let maxElm (arr: int []) tNum = 
+  let mutable threadNum = 0
+  if tNum > arr.Length then threadNum <- arr.Length
+  else threadNum <- tNum
   let step = arr.Length / threadNum
   let res = ref arr.[0]
 
@@ -22,8 +25,9 @@ let maxElm (arr: int []) threadNum =
       Monitor.Exit(res)
     ))
   )
+  let tn = threadNum
   let thrLast = new Thread(ThreadStart(fun _ ->
-    let thRes = Array.max arr.[((threadNum - 1) * step)..arr.Length - 1]
+    let thRes = Array.max arr.[((tn - 1) * step)..arr.Length - 1]
     Monitor.Enter(res)
     if thRes > !res then res := thRes
     Monitor.Exit(res)
@@ -48,8 +52,8 @@ let duration s f =
 
 [<EntryPoint>]
 let main argv = 
-  let rnd = new System.Random(2)
-  let a = Array.init 100000000 (fun i -> rnd.Next(0, 100000000))
+  let rnd = new System.Random(1)
+  let a = Array.init 10 (fun i -> rnd.Next(0, 1000))
   //printfn "%A" a
   for i in [("1", 1); ("2", 2); ("4", 4); ("8", 8); ("16", 16)] do
     printfn "%d" (maxElm a (snd i))

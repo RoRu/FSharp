@@ -16,6 +16,13 @@ let ``Max of 10^8 elements`` () =
     Assert.AreEqual(maxElm a n, 100000000)
 
 [<Test>]
+let ``Max in array with a lot of random elms 4`` () = 
+  let rnd = new System.Random(1)
+  let a = Array.init 10 (fun i -> rnd.Next(0, 1000))
+  for n in [1; 2; 4; 8; 16] do
+    Assert.AreEqual(maxElm a n, 943)
+
+[<Test>]
 let ``Max in array with a lot of random elms`` () = 
   let rnd = new System.Random(1)
   let a = Array.init 10000000 (fun i -> rnd.Next(0, 10000000))
